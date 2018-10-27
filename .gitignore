@@ -1,0 +1,14 @@
+*.ignore
+*sim_build*
+*.xml
+*.pyc
+*.vcd
+*.jou
+*.log
+*.Xil*
+*.str
+/hdl/synth/*/*
+!/hdl/synth/*/*.bd
+/proj/*
+!/proj/proj.xpr
+
