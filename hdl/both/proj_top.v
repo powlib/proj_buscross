@@ -21,6 +21,9 @@
 
 
 module proj_top(sys_clock,reset,GPIO_0_tri_io);
+
+`include "powlib_std.vh"
+`include "powlib_ip.vh" 
     
   localparam                                LEDW            = 16;
   localparam                                LITE_IDW        = 1;
@@ -62,7 +65,12 @@ module proj_top(sys_clock,reset,GPIO_0_tri_io);
         wire [B_AW-1:0]             wraddr[0:TOTAL_INTRS-1], rdaddr[0:TOTAL_INTRS-1];
         wire [B_WW-1:0]             wrdatapacked[0:TOTAL_INTRS-1], rddatapacked[0:TOTAL_INTRS-1];
         wire                        wrvld[0:TOTAL_INTRS-1], wrrdy[0:TOTAL_INTRS-1], rdvld[0:TOTAL_INTRS-1], rdrdy[0:TOTAL_INTRS-1];
-
+        
+        wire [B_AW-1:0]             awaddr, araddr;
+        wire [B_BE-1:0]             wstrb;
+        wire [B_DW-1:0]             wdata, rdata;
+        wire [`AXI_RESPW-1:0]       bresp, rresp;
+        
         genvar                      i;  
     
   // Assign the same clk to all clock and reset inputs.
