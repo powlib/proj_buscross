@@ -11,4 +11,10 @@
 !/hdl/synth/*/*.bd
 /proj/*
 !/proj/proj.xpr
+/sdk/SDK.log
+/sdk/.metadata*
+/sdk/RemoteSystemsTempFile*
+/sdk/*/Debug*
+*.o
+*.a
 

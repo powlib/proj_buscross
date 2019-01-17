@@ -31,7 +31,7 @@ module proj_top(sys_clock,reset,GPIO_0_tri_io);
   localparam                                LITE_LEN        = 8'd0;
   localparam                                LITE_SIZE       = 3'd2;
   localparam                                LITE_BURST      = `AXI_INCRBT;
-  localparam                                RAM_D           = 0;
+  localparam                                RAM_D           = 8;
   localparam                                RAM_S           = 0;
   localparam                                TOTAL_INTRS     = 3;
   localparam                                IPSAXI_OFFSET   = 0;
@@ -49,7 +49,7 @@ module proj_top(sys_clock,reset,GPIO_0_tri_io);
   localparam                                OFF_2           = OFF_1+B_BEW;
   localparam                                OFF_3           = OFF_2+B_OPW;
   localparam                                B_WW            = OFF_3;  
-  localparam                                B_BASES         = {32'h50020000,32'h50010000,32'h50000000};
+  localparam                                B_BASES         = {32'h44A10000,32'h44A00000,32'h50000000};
   localparam                                B_SIZES         = {32'h0000FFFF,32'h0000FFFF,32'h0000FFFF};  
     
   input wire                        sys_clock, reset;
@@ -67,7 +67,7 @@ module proj_top(sys_clock,reset,GPIO_0_tri_io);
         wire                        wrvld[0:TOTAL_INTRS-1], wrrdy[0:TOTAL_INTRS-1], rdvld[0:TOTAL_INTRS-1], rdrdy[0:TOTAL_INTRS-1];
         
         wire [B_AW-1:0]             awaddr, araddr;
-        wire [B_BE-1:0]             wstrb;
+        wire [B_BEW-1:0]            wstrb;
         wire [B_DW-1:0]             wdata, rdata;
         wire [`AXI_RESPW-1:0]       bresp, rresp;
         
@@ -113,12 +113,14 @@ module proj_top(sys_clock,reset,GPIO_0_tri_io);
     .ID("RAM0"),.EAR(EAR),.EDBG(EDBG),.IN_D(RAM_D),.IN_S(RAM_S),.B_SIZE(B_SIZES[B_AW*IPRAM0_OFFSET+:B_AW]),.B_BPD(B_BPD),.B_AW(B_AW))
   ram0_inst (
     .wraddr(wraddr[IPRAM0_OFFSET]),.wrdata(wrdatapacked[IPRAM0_OFFSET]),.wrvld(wrvld[IPRAM0_OFFSET]),.wrrdy(wrrdy[IPRAM0_OFFSET]),
-    .rdaddr(rdaddr[IPRAM0_OFFSET]),.rddata(rddatapacked[IPRAM0_OFFSET]),.rdvld(rdvld[IPRAM0_OFFSET]),.rdrdy(rdrdy[IPRAM0_OFFSET]));  
+    .rdaddr(rdaddr[IPRAM0_OFFSET]),.rddata(rddatapacked[IPRAM0_OFFSET]),.rdvld(rdvld[IPRAM0_OFFSET]),.rdrdy(rdrdy[IPRAM0_OFFSET]),
+    .clk(clk),.rst(rst));  
   powlib_ipram #(
     .ID("RAM1"),.EAR(EAR),.EDBG(EDBG),.IN_D(RAM_D),.IN_S(RAM_S),.B_SIZE(B_SIZES[B_AW*IPRAM1_OFFSET+:B_AW]),.B_BPD(B_BPD),.B_AW(B_AW))
   ram1_inst (
     .wraddr(wraddr[IPRAM1_OFFSET]),.wrdata(wrdatapacked[IPRAM1_OFFSET]),.wrvld(wrvld[IPRAM1_OFFSET]),.wrrdy(wrrdy[IPRAM1_OFFSET]),
-    .rdaddr(rdaddr[IPRAM1_OFFSET]),.rddata(rddatapacked[IPRAM1_OFFSET]),.rdvld(rdvld[IPRAM1_OFFSET]),.rdrdy(rdrdy[IPRAM1_OFFSET]));       
+    .rdaddr(rdaddr[IPRAM1_OFFSET]),.rddata(rddatapacked[IPRAM1_OFFSET]),.rdvld(rdvld[IPRAM1_OFFSET]),.rdrdy(rdrdy[IPRAM1_OFFSET]),
+    .clk(clk),.rst(rst));       
 
   // Board design instantiation.
   xilinx_ip_wrapper ip_wrapper_inst 
