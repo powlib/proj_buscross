@@ -13,6 +13,7 @@
 !/proj/proj.xpr
 /sdk/SDK.log
 /sdk/.metadata*
+/sdk/.sdk*
 /sdk/RemoteSystemsTempFile*
 /sdk/*/Debug*
 *.o

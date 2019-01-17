@@ -16,7 +16,7 @@ def test_proj(top):
     
     tb = TestEnvironment(top)
     yield tb.start()
-    yield Timer(10000,"ns")
+    yield Timer(30000,"ns")
     
 class TestEnvironment(object):
     '''
