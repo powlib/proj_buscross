@@ -16,6 +16,7 @@
 /sdk/.sdk*
 /sdk/RemoteSystemsTempFile*
 /sdk/*/Debug*
+/sdk/webtalk*
 *.o
 *.a
 
