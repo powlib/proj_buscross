@@ -26,11 +26,8 @@ module proj_top(sys_clock,reset,GPIO_0_tri_io);
 `include "powlib_ip.vh" 
     
   localparam                                LEDW            = 16;
-  localparam                                LITE_IDW        = 1;
-  localparam                                LITE_ID         = 1'd0;
-  localparam                                LITE_LEN        = 8'd0;
-  localparam                                LITE_SIZE       = 3'd2;
-  localparam                                LITE_BURST      = `AXI_INCRBT;
+  localparam                                FULL_IDW        = 1;
+  localparam                                FULL_ID         = 1'd0;
   localparam                                RAM_D           = 8;
   localparam                                RAM_S           = 0;
   localparam                                TOTAL_INTRS     = 3;
@@ -67,6 +64,9 @@ module proj_top(sys_clock,reset,GPIO_0_tri_io);
         wire                        wrvld[0:TOTAL_INTRS-1], wrrdy[0:TOTAL_INTRS-1], rdvld[0:TOTAL_INTRS-1], rdrdy[0:TOTAL_INTRS-1];
         
         wire [B_AW-1:0]             awaddr, araddr;
+        wire [`AXI_LENW-1:0]        awlen, arlen;
+        wire [`AXI_SIZEW-1:0]       awsize, arsize;
+        wire [`AXI_BURSTW-1:0]      awburst, arburst;
         wire [B_BEW-1:0]            wstrb;
         wire [B_DW-1:0]             wdata, rdata;
         wire [`AXI_RESPW-1:0]       bresp, rresp;
@@ -97,15 +97,15 @@ module proj_top(sys_clock,reset,GPIO_0_tri_io);
     
   // Instantiate the IP Slave AXI to PLB.
   powlib_ipsaxi #(
-    .ID("IPSAXI"),.EAR(EAR),.EDBG(EDBG),.B_BPD(B_BPD),.B_AW(B_AW),.IDW(LITE_IDW),.B_BASE(B_BASES[B_AW*IPSAXI_OFFSET+:B_AW]))
+    .ID("IPSAXI"),.EAR(EAR),.EDBG(EDBG),.B_BPD(B_BPD),.B_AW(B_AW),.IDW(FULL_IDW),.B_BASE(B_BASES[B_AW*IPSAXI_OFFSET+:B_AW]))
   ipsaxi_inst (
     .wraddr(wraddr[IPSAXI_OFFSET]),.wrdata(wrdatapacked[IPSAXI_OFFSET]),.wrvld(wrvld[IPSAXI_OFFSET]),.wrrdy(wrrdy[IPSAXI_OFFSET]),
     .rdaddr(rdaddr[IPSAXI_OFFSET]),.rddata(rddatapacked[IPSAXI_OFFSET]),.rdvld(rdvld[IPSAXI_OFFSET]),.rdrdy(rdrdy[IPSAXI_OFFSET]),
-    .awid(LITE_ID),.awaddr(awaddr),.awlen(LITE_LEN),.awsize(LITE_SIZE),.awburst(LITE_BURST),.awvalid(awvalid),.awready(awready),
-    .wdata(wdata),.wstrb(wstrb),.wlast(1'd1),.wvalid(wvalid),.wready(wready),
+    .awid(FULL_ID),.awaddr(awaddr),.awlen(awlen),.awsize(awsize),.awburst(awburst),.awvalid(awvalid),.awready(awready),
+    .wdata(wdata),.wstrb(wstrb),.wlast(wlast),.wvalid(wvalid),.wready(wready),
     .bresp(bresp),.bvalid(bvalid),.bready(bready),
-    .arid(LITE_ID),.araddr(araddr),.arlen(LITE_LEN),.arsize(LITE_SIZE),.arburst(LITE_BURST),.arvalid(arvalid),.arready(arready),
-    .rdata(rdata),.rresp(rresp),.rvalid(rvalid),.rready(rready),
+    .arid(FULL_ID),.araddr(araddr),.arlen(arlen),.arsize(arsize),.arburst(arburst),.arvalid(arvalid),.arready(arready),
+    .rdata(rdata),.rresp(rresp),.rlast(rlast),.rvalid(rvalid),.rready(rready),
     .clk(clk),.rst(rst));  
 
   // Instantiate the IP RAMs.
@@ -126,22 +126,30 @@ module proj_top(sys_clock,reset,GPIO_0_tri_io);
   xilinx_ip_wrapper ip_wrapper_inst 
    (.GPIO_0_tri_io(GPIO_0_tri_io),
     .M01_AXI_0_araddr(araddr),
+    .M01_AXI_0_arburst(arburst),
+    .M01_AXI_0_arlen(arlen),
     .M01_AXI_0_arready(arready),
+    .M01_AXI_0_arsize(arsize),
     .M01_AXI_0_arvalid(arvalid),
     .M01_AXI_0_awaddr(awaddr),
+    .M01_AXI_0_awburst(awburst),
+    .M01_AXI_0_awlen(awlen),
     .M01_AXI_0_awready(awready),
+    .M01_AXI_0_awsize(awsize),
     .M01_AXI_0_awvalid(awvalid),
     .M01_AXI_0_bready(bready),
     .M01_AXI_0_bresp(bresp),
     .M01_AXI_0_bvalid(bvalid),
     .M01_AXI_0_rdata(rdata),
+    .M01_AXI_0_rlast(rlast),
     .M01_AXI_0_rready(rready),
     .M01_AXI_0_rresp(rresp),
     .M01_AXI_0_rvalid(rvalid),
     .M01_AXI_0_wdata(wdata),
+    .M01_AXI_0_wlast(wlast),
     .M01_AXI_0_wready(wready),
     .M01_AXI_0_wstrb(wstrb),
-    .M01_AXI_0_wvalid(wvalid),
+    .M01_AXI_0_wvalid(wvalid),   
     .clk(clk),
     .reset(reset),
     .rst(rst),
