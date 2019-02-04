@@ -18,5 +18,4 @@
 /sdk/*/Debug*
 /sdk/webtalk*
 *.o
-*.a
 
