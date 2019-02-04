@@ -9,25 +9,19 @@
 #include <xgpio.h>
 #include <xparameters.h>
 #include <xil_assert.h>
+#include <xaxicdma.h>
 
 #define RAM0_BASE    ((volatile uint32_t*)0x44A10000)
 #define RAM1_BASE    ((volatile uint32_t*)0x44A00000)
-#define TOTAL_CHECKS (128)
+#define TOTAL        (16)
 #define RUNNING_MASK (0xFF00)
 #define SUCCESS_MASK (0x00FF)
 
-uint32_t ramExp0[TOTAL_CHECKS];
-uint32_t ramExp1[TOTAL_CHECKS];
 XGpio    ledObj;
-
-uint16_t lfsr();
+XAxiCdma cdmaObj;
 
 int main()
 {
-	/* Write some data to the RAMs and read it back, just so it can be seen in the simulation. */
-	RAM0_BASE[0] = 0x12345678;
-	RAM1_BASE[0] = RAM0_BASE[0];
-
 	/* Set up driver for Xilinx GPIO core. */
 	Xil_AssertNonvoid(XGpio_Initialize(&ledObj, XPAR_AXI_GPIO_0_DEVICE_ID)==XST_SUCCESS);
 	XGpio_SetDataDirection(&ledObj, XGPIO_IR_CH1_MASK, 0);
@@ -35,39 +29,37 @@ int main()
 	/* Set a specific pattern on the LEDs to indicate the design is running. */
 	XGpio_DiscreteWrite(&ledObj, XGPIO_IR_CH1_MASK, RUNNING_MASK);
 
-	/* Generate the random data with simple linear-feedback register operation. */
+	/* Configure your CDMA. */
 	{
-		uint32_t *expPtr0=ramExp0, *expPtr1=ramExp1, *expPtrEnd=(ramExp0+TOTAL_CHECKS);
-
-		while (expPtr0!=expPtrEnd)
-		{
-			*(expPtr0++) = (lfsr()<<16)|lfsr();
-			*(expPtr1++) = (lfsr()<<16)|lfsr();
-		}
+		XAxiCdma_Config* config = XAxiCdma_LookupConfig(XPAR_AXI_CDMA_0_DEVICE_ID);
+		Xil_AssertNonvoid(config!=NULL);
+		Xil_AssertNonvoid(XST_SUCCESS==XAxiCdma_CfgInitialize(&cdmaObj, config, config->BaseAddress));
 	}
 
-	/* Write the data into the RAMs across the powlib crossbar. */
+	/* Write some data to RAM0. */
 	{
-		         uint32_t *expPtr0=ramExp0, *expPtr1=ramExp1, *expPtrEnd=(ramExp0+TOTAL_CHECKS);
-		volatile uint32_t *ramPtr0=RAM0_BASE, *ramPtr1=RAM1_BASE;
+		volatile uint32_t* endptr = RAM0_BASE+TOTAL;
+		volatile uint32_t* curptr = RAM0_BASE;
+		         uint32_t  value  = 0;
 
-		while (expPtr0!=expPtrEnd)
-		{
-			*(ramPtr0++) = *(expPtr0++);
-			*(ramPtr1++) = *(expPtr1++);
-		}
+		while (curptr!=endptr) *(curptr++) = value++;
 	}
 
-	/* Read data back and check the data. */
-	{
-                 uint32_t *expPtr0=ramExp0, *expPtr1=ramExp1, *expPtrEnd=(ramExp0+TOTAL_CHECKS);
-        volatile uint32_t *ramPtr0=RAM0_BASE, *ramPtr1=RAM1_BASE;
+	/* Perform the CDMA transfer. */
+	Xil_AssertNonvoid(XST_SUCCESS==XAxiCdma_SimpleTransfer(&cdmaObj,
+			(UINTPTR)RAM0_BASE, (UINTPTR)RAM1_BASE,
+			TOTAL*sizeof(uint32_t), NULL, NULL));
 
-		while (expPtr0!=expPtrEnd)
-		{
-			Xil_AssertNonvoid((*(ramPtr0++)==*(expPtr0++))&&
-					          (*(ramPtr1++)==*(expPtr1++)));
-		}
+	/* Wait until the transfer is finished. */
+	while (XAxiCdma_IsBusy(&cdmaObj)) continue;
+
+	/* Score the data through comparison. */
+	{
+		volatile uint32_t* endptr = RAM0_BASE+TOTAL;
+		volatile uint32_t* rm0ptr = RAM0_BASE;
+		volatile uint32_t* rm1ptr = RAM1_BASE;
+
+		while (rm0ptr!=endptr) Xil_AssertNonvoid(*(rm0ptr++)==*(rm1ptr++));
 	}
 
 	/* Set a specific pattern on the LEDs to indicate the design is successfully ended. */
@@ -76,15 +68,3 @@ int main()
 	return 0;
 }
 
-uint16_t lfsr()
-{
-	static uint16_t cur = 0xACE1u;
-	uint16_t bit;
-	uint16_t ret = cur;
-
-	/* taps: 16 14 13 11; feedback polynomial: x^16 + x^14 + x^13 + x^11 + 1 */
-	bit  = ((cur >> 0) ^ (cur >> 2) ^ (cur >> 3) ^ (cur >> 5) ) & 1;
-	cur =  (cur >> 1) | (bit << 15);
-
-	return ret;
-}
