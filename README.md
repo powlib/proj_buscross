@@ -30,18 +30,18 @@ git clone https://github.com/powlib/proj_buscross.git --recursive
     + **both**: Contains the sources needed by both simulation and synthesis.
         + **proj_top.v**: Top-level verilog module.
     + **synth**: Contains the sources solely needed by the physical build.
-        + **xilinx_ip/xilinx_ip.bd**: Board design. Opened with Vivado 2017.4. This board design contains the Microblaze systemt that interfaces with the crossbar.
-        + **xilinx_ip_wrapper.v**: Wrapper of the board design.
+        + **xilinx_ip/xilinx_ip.bd**: Block design. Opened with Vivado 2017.4. This block design contains the Microblaze systemt that interfaces with the crossbar.
+        + **xilinx_ip_wrapper.v**: Wrapper of the block design.
 + **sdk**: Contains the SDK 2017.4 workspace, where all the software that runs on the Microblze is located. After SDK is configured with this folder as the workspace, the projects should be imported into the workspace. An error may appear regarding the creation of the hardware platform, but this message can be ignored.
     + **proj_app_0**: Application project. Contains the top-level software that runs on the Microblaze. The main.c file describes the operation of the Microblaze. Depends on the board support package.
     + **standalone_bsp_0**: Board support package. Contains the drivers necessary to run the application project. Depends on the hardware platform.
-    + **proj_top_hw_platform_0**: Hardware platform. Contains the hardware description---generated from the board design in Vivado---and the bitstream---built from the entire design in Vivado.
+    + **proj_top_hw_platform_0**: Hardware platform. Contains the hardware description---generated from the block design in Vivado---and the bitstream---built from the entire design in Vivado.
 + **simlib**: Contains the powlib simulation library, a dependency of the simulations.
 + **powlib**: Contains the powlib hardware description library. The powlib crossbar can be found here.
 + **tcf**: Contains the simulation test case files.
     + **test_proj.py**: Test case file. Drives the functional model of the Microblaze system in simulation, and waits until the design either returns a success or times out. Simply run make in the tcf folder to execute the test, assuming Icarus Verilog or another cocotb-valid simulator is configured.
 + **proj**: Contains the vivado project folder.
-    + **proj.xpr**: Vivado project file. Open this in Vivado 2017.4 to view and build the project.
+    + **proj.xpr**: Vivado project file. Open this in Vivado 2017.4 to view and build the project. Before the full design---proj_top is top---can be built, the block design should be generated with Out of context per Block Design and the application project should be compiled to create the ELF.
 
 ## Design
 
