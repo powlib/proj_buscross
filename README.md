@@ -13,13 +13,25 @@ The purpose of this project is to perform a simple test of the powlib crossbar o
     + **Digilent Nexys 4 DDR board file**: The Vivado project requires [a board file which can be found in a Digilent repo](https://github.com/Digilent/vivado-boards).
 + **Digilent Nexys 4 DDR board**: This is the board the design is targetting.
 
+## Downloading Repository
+
+It is recommended the repository is cloned, since the submodules are not included with a download. The following is the git command.
+
+```
+git clone https://github.com/powlib/proj_buscross.git --recursive
+```
+
 ## File Structure
 
 + **cocotb**: Submodule that contains cocotb, a dependency of the simulations.
 + **hdl**: Contains the source specific to the project.
     + **behav**: Contains the sources related solely to simulation.
+        + **xilinx_ip_wrapper_behav.v**: Functional model of the Microblaze system, generated in Vivado. 
     + **both**: Contains the sources needed by both simulation and synthesis.
+        + **proj_top.v**: Top-level verilog module.
     + **synth**: Contains the sources solely needed by the physical build.
+        + **xilinx_ip/xilinx_ip.bd**: Board design. Opened with Vivado 2017.4. This board design contains the Microblaze systemt that interfaces with the crossbar.
+        + **xilinx_ip_wrapper.v**: Wrapper of the board design.
 + **sdk**: Contains the SDK 2017.4 workspace, where all the software that runs on the Microblze is located. After SDK is configured with this folder as the workspace, the projects should be imported into the workspace. An error may appear regarding the creation of the hardware platform, but this message can be ignored.
     + **proj_app_0**: Application project. Contains the top-level software that runs on the Microblaze. The main.c file describes the operation of the Microblaze. Depends on the board support package.
     + **standalone_bsp_0**: Board support package. Contains the drivers necessary to run the application project. Depends on the hardware platform.
