@@ -3,7 +3,7 @@
 <!--                                                         -->
 <!-- Copyright 1986-2017 Xilinx, Inc. All Rights Reserved.   -->
 
-<Project Version="7" Minor="35" Path="C:/workspaces/git_ws/proj_buscross/proj/proj.xpr">
+<Project Version="7" Minor="35">
   <DefaultLaunch Dir="$PRUNDIR"/>
   <Configuration>
     <Option Name="Id" Val="b0bca62ba5f34840ba4cb69e81af741d"/>
