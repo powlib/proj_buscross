@@ -32,7 +32,7 @@ git clone https://github.com/powlib/proj_buscross.git --recursive
     + **synth**: Contains the sources solely needed by the physical build.
         + **xilinx_ip/xilinx_ip.bd**: Block design. Opened with Vivado 2017.4. This block design contains the Microblaze systemt that interfaces with the crossbar.
         + **xilinx_ip_wrapper.v**: Wrapper of the block design.
-+ **sdk**: Contains the SDK 2017.4 workspace, where all the software that runs on the Microblze is located. After SDK is configured with this folder as the workspace, the projects should be imported into the workspace. An error may appear regarding the creation of the hardware platform, but this message can be ignored.
++ **sdk**: Contains the SDK 2017.4 workspace, where all the software that runs on the Microblze is located. After SDK is configured with this folder as the workspace, the projects should be imported into the workspace. An error may appear regarding the creation of the hardware platform, but this message can be ignored. Because a hardare specification file is not already found in the workspace folder itself, SDK 2017.4 must be opened outside of Vivado 2017.4.
     + **proj_app_0**: Application project. Contains the top-level software that runs on the Microblaze. The main.c file describes the operation of the Microblaze. Depends on the board support package.
     + **standalone_bsp_0**: Board support package. Contains the drivers necessary to run the application project. Depends on the hardware platform.
     + **proj_top_hw_platform_0**: Hardware platform. Contains the hardware description---generated from the block design in Vivado---and the bitstream---built from the entire design in Vivado.
