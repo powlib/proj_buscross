@@ -14,7 +14,7 @@
 #define RAM0_BASE    ((volatile uint32_t*)0x44A10000)
 #define RAM1_BASE    ((volatile uint32_t*)0x44A00000)
 #define TOTAL        (16)
-#define RUNNING_MASK (0xFF00)
+#define RUNNING_MASK (0xFFF0)
 #define SUCCESS_MASK (0x00FF)
 
 XGpio    ledObj;

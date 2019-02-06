@@ -63,6 +63,7 @@ module proj_top(sys_clock,reset,GPIO_0_tri_io);
         wire [B_WW-1:0]             wrdatapacked[0:TOTAL_INTRS-1], rddatapacked[0:TOTAL_INTRS-1];
         wire                        wrvld[0:TOTAL_INTRS-1], wrrdy[0:TOTAL_INTRS-1], rdvld[0:TOTAL_INTRS-1], rdrdy[0:TOTAL_INTRS-1];
         
+        wire [FULL_IDW-1:0]         awid, arid, bid, rid;
         wire [B_AW-1:0]             awaddr, araddr;
         wire [`AXI_LENW-1:0]        awlen, arlen;
         wire [`AXI_SIZEW-1:0]       awsize, arsize;
@@ -101,11 +102,11 @@ module proj_top(sys_clock,reset,GPIO_0_tri_io);
   ipsaxi_inst (
     .wraddr(wraddr[IPSAXI_OFFSET]),.wrdata(wrdatapacked[IPSAXI_OFFSET]),.wrvld(wrvld[IPSAXI_OFFSET]),.wrrdy(wrrdy[IPSAXI_OFFSET]),
     .rdaddr(rdaddr[IPSAXI_OFFSET]),.rddata(rddatapacked[IPSAXI_OFFSET]),.rdvld(rdvld[IPSAXI_OFFSET]),.rdrdy(rdrdy[IPSAXI_OFFSET]),
-    .awid(FULL_ID),.awaddr(awaddr),.awlen(awlen),.awsize(awsize),.awburst(awburst),.awvalid(awvalid),.awready(awready),
+    .awid(awid),.awaddr(awaddr),.awlen(awlen),.awsize(awsize),.awburst(awburst),.awvalid(awvalid),.awready(awready),
     .wdata(wdata),.wstrb(wstrb),.wlast(wlast),.wvalid(wvalid),.wready(wready),
-    .bresp(bresp),.bvalid(bvalid),.bready(bready),
-    .arid(FULL_ID),.araddr(araddr),.arlen(arlen),.arsize(arsize),.arburst(arburst),.arvalid(arvalid),.arready(arready),
-    .rdata(rdata),.rresp(rresp),.rlast(rlast),.rvalid(rvalid),.rready(rready),
+    .bid(bid),.bresp(bresp),.bvalid(bvalid),.bready(bready),
+    .arid(arid),.araddr(araddr),.arlen(arlen),.arsize(arsize),.arburst(arburst),.arvalid(arvalid),.arready(arready),
+    .rid(rid),.rdata(rdata),.rresp(rresp),.rlast(rlast),.rvalid(rvalid),.rready(rready),
     .clk(clk),.rst(rst));  
 
   // Instantiate the IP RAMs.
@@ -125,21 +126,25 @@ module proj_top(sys_clock,reset,GPIO_0_tri_io);
   // Board design instantiation.
   xilinx_ip_wrapper ip_wrapper_inst 
    (.GPIO_0_tri_io(GPIO_0_tri_io),
+    .M01_AXI_0_arid(arid),
     .M01_AXI_0_araddr(araddr),
     .M01_AXI_0_arburst(arburst),
     .M01_AXI_0_arlen(arlen),
     .M01_AXI_0_arready(arready),
     .M01_AXI_0_arsize(arsize),
     .M01_AXI_0_arvalid(arvalid),
+    .M01_AXI_0_awid(awid),
     .M01_AXI_0_awaddr(awaddr),
     .M01_AXI_0_awburst(awburst),
     .M01_AXI_0_awlen(awlen),
     .M01_AXI_0_awready(awready),
     .M01_AXI_0_awsize(awsize),
     .M01_AXI_0_awvalid(awvalid),
+    .M01_AXI_0_bid(bid),
     .M01_AXI_0_bready(bready),
     .M01_AXI_0_bresp(bresp),
     .M01_AXI_0_bvalid(bvalid),
+    .M01_AXI_0_rid(rid),
     .M01_AXI_0_rdata(rdata),
     .M01_AXI_0_rlast(rlast),
     .M01_AXI_0_rready(rready),
